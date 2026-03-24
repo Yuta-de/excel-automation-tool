@@ -1,0 +1,13 @@
+excel_automation/
+│
+├─ core/                     ← ロジック（処理）だけを集める
+│   ├─ main_logic.py         ← main() と処理関数すべて
+│   ├─ config_loader.py      ← config.ini 読み込み
+│   └─ logger_setup.py       ← logging 初期化
+│
+├─ gui/
+│   └─ gui_app.py            ← Tkinter GUI（GUI専用）
+│
+├─ run.py                    ← CLI（コマンド実行用）
+├─ config.ini
+└─ requirements.txt（任意）

@@ -114,7 +114,7 @@ def gui_main():
         try:
             main(config)
         finally:
-            run_button.config(state="normal")
+            root.after(0, lambda: run_button.config(state="normal"))
     
     def run_main():
         run_button.config(state="disabled")

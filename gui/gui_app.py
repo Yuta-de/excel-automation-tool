@@ -14,6 +14,7 @@ import os
 from core.main_logic import main
 from core.config_loader import load_config
 from core.logger_setup import setup_logger
+from core.config_validator import validate_config, validate_config_file_exists
 
 log_queue = queue.Queue()
 
@@ -29,31 +30,16 @@ sys.stdout = QueueLogger()
 sys.stderr = QueueLogger()
 
 def safe_load_config():
-    # ファイルチェック
-    if not os.path.exists("config.ini"):
-        messagebox.showerror("エラー", "config.iniが見つかりません")
+    try:
+        config_path = "config.ini"
+        validate_config_file_exists(config_path)
+        config = load_config(config_path)
+        validate_config(config)
+        return config
+    
+    except Exception as e:
+        messagebox.showerror("設定エラー", str(e))
         return None
-    
-    config = load_config()
-
-    # 必須セクションとキーのチェック
-    required = {
-        "PATH": ["input_folder", "template_path", "output_path"],
-        "LOG": ["log_file"]
-    }
-
-    for section, keys in required.items():
-        if section not in config:
-            messagebox.showerror("エラー", f"config.ini に [{section}] セクションがありません。")
-            return None
-        for key in keys:
-            if key not in config[section]:
-                messagebox.showerror("エラー", f"config.ini の [{section}] に {key} がありません。")
-                return None
-    
-    return config
-
-
 
 # --- GUI本体 ---
 def gui_main():

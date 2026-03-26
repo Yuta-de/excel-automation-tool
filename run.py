@@ -7,8 +7,18 @@ from core.main_logic import main
 from core.config_loader import load_config
 from core.logger_setup import setup_logger
 
+from core.config_validator import validate_config_file_exists, validate_config
+
 def run_cli():
-    config = load_config()
+    try:
+        config_path = "config.ini"
+        validate_config_file_exists(config_path)
+        config = load_config(config_path)
+        validate_config(config)
+    except Exception as e:
+        print(f"設定エラー：{e}")
+        return
+
     setup_logger(config["LOG"]["log_file"])
     main(config)
 

@@ -30,7 +30,7 @@ sys.stdout = QueueLogger()
 sys.stderr = QueueLogger()
 
 def safe_load_config():
-    try :
+    try:
         config_path = "config.ini"
         validate_config_file_exists(config_path)
         config = load_config(config_path)

@@ -4,3 +4,5 @@ logs/
 .env
 .venv/
 .vscode/
+work1/データ出力/
+config.ini

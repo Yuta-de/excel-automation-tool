@@ -6,7 +6,9 @@ import logging
 import os
 
 def setup_logger(log_file: str) -> None:
-    os.makedirs("logs", exist_ok=True)
+    log_dir = os.path.dirname(log_file)
+    if log_dir:
+        os.makedirs(log_dir, exist_ok=True)
 
     logging.basicConfig(
         level=logging.INFO,

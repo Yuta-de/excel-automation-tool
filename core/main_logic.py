@@ -10,6 +10,27 @@ from openpyxl import load_workbook
 from typing import Dict
 from openpyxl.workbook import Workbook
 
+# テンプレートに必要なシート
+REQUIRED_SHEETS = [
+    "データ統合",
+    "カテゴリ別売上",
+    "商品別売上",
+    "店舗別売上",
+    "日付別売上",
+]
+
+# テンプレートシートの検証関数
+def validate_template_sheets(wb: Workbook) -> None:
+    missing_sheets = [sheet for sheet in REQUIRED_SHEETS if sheet not in wb.sheetnames]
+    
+    if missing_sheets:
+        raise ValueError("テンプレートに必要なシートが不足しています：\n"
+                         f"必要シート：{', '.join(REQUIRED_SHEETS)}\n"
+                         f"不足シート：{', '.join(missing_sheets)}")
+
+
+
+
 # 売上ファイルを読み込んで結合データを作る関数
 def load_sales_files(input_folder : str) -> pd.DataFrame:
     logging.info("売上ファイルの読み込み開始")
@@ -105,6 +126,7 @@ def main(config) -> None:
 
         template_path = config["PATH"]["template_path"]
         wb = load_workbook(template_path)
+        validate_template_sheets(wb)
 
         # 統合データの書き込み
         write_df_to_sheet(wb, df, sheet_name="データ統合")

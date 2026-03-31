@@ -9,12 +9,13 @@ from tkinter import messagebox
 import threading
 import queue
 import sys
-import os
 
 from core.main_logic import main
-from core.config_loader import load_config
+from core.config_loader import load_config, get_project_root
 from core.logger_setup import setup_logger
 from core.config_validator import validate_config, validate_config_file_exists
+
+from pathlib import Path
 
 log_queue = queue.Queue()
 
@@ -31,9 +32,10 @@ sys.stderr = QueueLogger()
 
 def safe_load_config():
     try:
-        config_path = "config.ini"
-        validate_config_file_exists(config_path)
-        config = load_config(config_path)
+        BASE_DIR = get_project_root()
+        config_path = BASE_DIR / "config.ini"
+        validate_config_file_exists(str(config_path))
+        config = load_config(str(config_path))
         validate_config(config)
         return config
     
@@ -56,7 +58,7 @@ def gui_main():
     tk.Label(root, text="入力フォルダ").grid(row=0, column=0)
     input_var = tk.StringVar()
     try :
-        input_var.set(config["PATH"]["input_folder"].replace("\\*.xlsx", ""))
+        input_var.set(str(Path(config["PATH"]["input_folder"])))
     except Exception:
         input_var.set("")
     input_entry = tk.Entry(root, textvariable=input_var, width=50)
@@ -104,31 +106,31 @@ def gui_main():
     
     def run_main():
         run_button.config(state="disabled")
-        config["PATH"]["input_folder"] = os.path.join(input_var.get(), "*.xlsx")
-        config["PATH"]["template_path"] = template_var.get()
-        config["PATH"]["output_path"] = output_var.get()
+        config["PATH"]["input_folder"] = str(Path(input_var.get()))
+        config["PATH"]["template_path"] = str(Path(template_var.get()))
+        config["PATH"]["output_path"] = str(Path(output_var.get()))
         threading.Thread(target=worker, daemon=True).start()
     
     def validate_paths():
         ok = True
 
         # 入力フォルダ
-        if os.path.isdir(input_var.get()):
+        if Path(input_var.get()).is_dir():
             input_entry.config(bg="white")
         else:
             input_entry.config(bg="#ffcccc")
             ok = False
 
         # テンプレート
-        if os.path.isfile(template_var.get()):
+        if Path(template_var.get()).is_file():
             template_entry.config(bg="white")
         else:
             template_entry.config(bg="#ffcccc")
             ok = False
 
         # 出力ファイル（フォルダが存在するかチェック）
-        out_dir = os.path.dirname(output_var.get())
-        if out_dir and os.path.isdir(out_dir):
+        out_dir = Path(output_var.get()).parent
+        if out_dir.exists():
             output_entry.config(bg="white")
         else:
             output_entry.config(bg="#ffcccc")

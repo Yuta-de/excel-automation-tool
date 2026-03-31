@@ -4,11 +4,10 @@
 
 import logging
 import pandas as pd
-import glob
-import os
 from openpyxl import load_workbook
 from typing import Dict
 from openpyxl.workbook import Workbook
+from pathlib import Path
 
 # テンプレートに必要なシート
 REQUIRED_SHEETS = [
@@ -32,14 +31,15 @@ def validate_template_sheets(wb: Workbook) -> None:
 
 
 # 売上ファイルを読み込んで結合データを作る関数
-def load_sales_files(input_folder : str) -> pd.DataFrame:
+def load_sales_files(input_folder: str) -> pd.DataFrame:
     logging.info("売上ファイルの読み込み開始")
     df_list = []
-    for file in glob.glob(input_folder):
+    input_dir = Path(input_folder)
+    for file in input_dir.glob("*.xlsx"):
         try:
             logging.info(f"読み込み中： {file}")
             df = pd.read_excel(file)
-            df["店舗名"] = os.path.basename(file).replace(".xlsx", "")
+            df["店舗名"] = file.stem
             df_list.append(df)
         except Exception as e:
             logging.error(f"読み込み失敗：{file} - {e}")

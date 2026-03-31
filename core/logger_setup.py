@@ -3,13 +3,10 @@
 # ====================
 
 import logging
-import os
+from pathlib import Path
 
 def setup_logger(log_file: str) -> None:
-    log_dir = os.path.dirname(log_file)
-    if log_dir:
-        os.makedirs(log_dir, exist_ok=True)
-
+    Path(log_file).parent.mkdir(parents=True, exist_ok=True)
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s [%(levelname)s] %(message)s",

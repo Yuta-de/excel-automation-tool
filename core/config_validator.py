@@ -1,6 +1,6 @@
 # config.iniの内容を検証するためのロジックのみ
 
-import os
+from pathlib import Path
 
 REQUIRED_SECTIONS = {
     "PATH": ["input_folder", "template_path", "output_path"],
@@ -8,7 +8,7 @@ REQUIRED_SECTIONS = {
 }
 
 def validate_config_file_exists(path: str) -> None:
-    if not os.path.exists(path):
+    if not Path(path).exists():
         raise FileNotFoundError(f"設定ファイルが見つかりません：{path}")
         
 def validate_config(config) -> None :

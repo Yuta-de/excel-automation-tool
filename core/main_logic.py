@@ -27,9 +27,6 @@ def validate_template_sheets(wb: Workbook) -> None:
                          f"必要シート：{', '.join(REQUIRED_SHEETS)}\n"
                          f"不足シート：{', '.join(missing_sheets)}")
 
-
-
-
 # 売上ファイルを読み込んで結合データを作る関数
 def load_sales_files(input_folder: str) -> pd.DataFrame:
     logging.info("売上ファイルの読み込み開始")

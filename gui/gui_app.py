@@ -8,27 +8,22 @@ from tkinter import filedialog
 from tkinter import messagebox
 import threading
 import queue
-import sys
+import logging
 
 from core.main_logic import main
 from core.config_loader import load_config, get_project_root
 from core.logger_setup import setup_logger
 from core.config_validator import validate_config, validate_config_file_exists
-
 from pathlib import Path
+
 
 log_queue = queue.Queue()
 
-# --- GUI用：ログをGUIに流すためのクラス ---
-class QueueLogger:
-    def write(self, msg):
-        log_queue.put(msg)
-    def flush(self):
-        pass   
-
-# GUIログ出力の有効化
-sys.stdout = QueueLogger()
-sys.stderr = QueueLogger()
+# --- GUI用：ログをGUIに流すためのhandler ---
+class QueueLogHandler(logging.Handler):
+    def emit(self, record):
+        msg = self.format(record)
+        log_queue.put(msg + "\n")
 
 def safe_load_config():
     try:
@@ -48,8 +43,13 @@ def gui_main():
     config = safe_load_config()
     if config is None:
         return
+    
+    gui_handler = QueueLogHandler()
+    gui_handler.setFormatter(
+        logging.Formatter("%(asctime)s [%(levelname)s] %(message)s", "%Y-%m-%d %H:%M:%S")
+    )
 
-    setup_logger(config["LOG"]["log_file"])
+    setup_logger(config["LOG"]["log_file"], extra_handlers=[gui_handler])
 
     root = tk.Tk()
     root.title("売上レポート自動生成ツール")
